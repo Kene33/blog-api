@@ -3,6 +3,7 @@ from typing import List, Optional
 
 class Posts(BaseModel):
     title: str
+    user_id: int
     username: str
     content: str
     category: str

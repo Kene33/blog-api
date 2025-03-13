@@ -34,8 +34,15 @@ async def check_user_exists(user_id: int) -> bool:
 
             return False
 
-async def get_posts(user_id: int, post_id: Optional[int] = None, tag: Optional[str] = None):
-    base_query = "SELECT * FROM posts WHERE user_id = ?"
+async def get_posts(user_id: Optional[int] = None, post_id: Optional[int] = None, tag: Optional[str] = None):
+    if user_id:
+        base_query = "SELECT * FROM posts WHERE user_id = ?"
+    else:
+        base_query = "SELECT * FROM posts"
+        async with aiosqlite.connect(DATABASE) as db:
+            async with db.execute(base_query) as cursor:
+                rows = await cursor.fetchall()
+                return rows
     params = [user_id]
 
     if post_id is not None:
