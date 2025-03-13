@@ -1,93 +1,78 @@
 import os
 import hashlib
-
-from fastapi import APIRouter
 from datetime import datetime
-
-from src.database import posts, user
+from fastapi import APIRouter, HTTPException, Query
+from src.database import posts as db_posts
 from src.schemas.posts import Posts, update_Posts
-from src.schemas.users import LoginRequest, RegisterRequest
 
 router = APIRouter()
 
 
-@router.get("/api/posts")
+@router.get("/api/posts", tags=["GET"], summary="Получить все посты")
 async def get_all_posts():
-    all_posts = await posts.get_all_posts()
+    all_posts = await db_posts.get_posts()
     return all_posts
 
-@router.post("/api/posts/{user_id}", tags=["POST"], summary="Добавление публикации")
-async def add_posts(data: Posts, user_id: int):
+
+@router.get("/api/posts/user/{user_id}", tags=["GET"], summary="Получить посты пользователя")
+async def get_posts_by_user(
+    user_id: int, 
+    post_id: int | None = Query(None, description="ID поста (опционально)"), 
+    tag: str | None = Query(None, description="Фильтр по тегу (опционально)")
+):
+    result = await db_posts.get_posts_by_user(user_id, post_id, tag)
+    return result
+
+@router.post("/api/posts", tags=["POST"], summary="Создание публикации")
+async def add_post(data: Posts):
     data = data.model_dump()
 
-    current_time = datetime.now()
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
+    title = data['title']
+    content = data['content']
+    username = data['username']
+    user_id = data['user_id']
+    category = data['category']
+    tags = data['tags']
+    image_url = data.get('image_url')
+    createdAt = current_time
 
+    await db_posts.create_database()
+    added_post = await db_posts.add_posts(user_id, username, title, content, category, tags, createdAt, createdAt, image_url)
+    if added_post.get("status"):
+        return {"ok": True, "info": "Post added successfully"}
+    raise HTTPException(status_code=400, detail="Error adding post")
+
+
+@router.put("/api/posts", tags=["PUT"], summary="Обновить публикацию")
+async def update_post(data: update_Posts):
+    data = data.model_dump()
+    current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    post_id = data['id']
+    user_id = data['user_id']
     title = data['title']
     content = data['content']
     category = data['category']
     tags = data['tags']
-    createdAt = formatted_time
-    updatedAt = formatted_time
-    img = data['image_url']
+    updatedAt = current_time
 
-    user_exists = await posts.check_user_exists(user_id)
-    if not user_exists:
-        await posts.create_database(user_id)
-        await posts.add_posts(
-            user_id, title, content, category, tags, createdAt, updatedAt, img
-            )
-    else:
-        await posts.add_posts(
-            user_id, title, content, category, tags, createdAt, updatedAt, img
-            )
-        
-    return {"ok": True, "info": "Task added successfully"}
+    update_result = await db_posts.update_posts(user_id, title, content, category, tags, updatedAt, post_id)
+    if update_result is True:
+        updated_post = await db_posts.get_post(user_id, post_id)
+        return {"ok": True, "info": "Post updated successfully", "post": updated_post}
+    raise HTTPException(status_code=400, detail="Error updating post")
 
 
-@router.put("/api/posts/{user_id}", summary="Обновить публикацию", tags=["PUT"])
-async def update_posts(data: update_Posts, user_id: int):
-    data = data.model_dump()
+@router.delete("/api/posts", tags=["DELETE"], summary="Удалить публикацию")
+async def delete_post(post_id: int = Query(...), user_id: int = Query(...)):
+    delete_result = await db_posts.delete_posts(user_id, post_id)
+    if delete_result is True:
+        return {"ok": True, "info": "Post deleted successfully"}
+    raise HTTPException(status_code=400, detail="Error deleting post")
 
-    current_time = datetime.now()
-
-    formatted_time = current_time.strftime("%Y-%m-%d %H:%M:%S")
-
-    id = data['id']
-    title = data['title']
-    content = data['content']
-    category = data['category']
-    tags = data['tags']
-    updatedAt = formatted_time
-
-    update_info = await posts.update_posts(
-        user_id, title, content, category, tags, updatedAt, id
-    )
-    if update_info == True:
-        updated_post = await posts.get_posts(user_id, id)
-        return {"ok": True, "info": "Task updated successfully", "posts": updated_post}
-    else:
-        return {"ok": False, "info": "Some problem with updated posts"}
-    
-
-@router.get("/api/posts/{user_id}", tags=["GET"], summary="Получение публикации", description="user_id обязательное поле для получения всех публикаций пользователя.\npost_id выдает публикацию пользователя по его айди.\ntag выдает публикации пользователя по тегам.")
-async def get_posts(user_id: int, post_id: int | None = None, tag: str | None = None):
-    posts = await posts.get_posts(user_id, post_id, tag)
-    return posts
-
-
-@router.delete("/api/delete_posts/{user_id}", tags=["DELETE"], summary="Удаление публикации", description="post_id айди публикации для удаления.")
-async def delete_posts(post_id: int, user_id: int):
-    delete_info = await posts.delete_posts(user_id, post_id)
-
-    if delete_info == True:
-        return {"ok": True, "info": "Task deleted successfully"}
-    else:
-        return {"ok": False, "info": "Some problem with deleted posts"}
-
-
-@router.get("/api/posts/{tag}", tags=["GET"], summary="Получение всех публикаций по тегам")
-async def find_posts(tag: str):
-    result = await posts.find_posts_by_tag(tag)
+@router.get("/api/posts/tag/{tag}", tags=["GET"], summary="Найти посты по тегу")
+async def find_posts_by_tag(tag: str):
+    result = await db_posts.find_posts_by_tag(tag)
     return result

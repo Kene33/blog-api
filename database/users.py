@@ -1,7 +1,4 @@
 import aiosqlite
-import json
-
-from src.schemas.users import LoginRequest, RegisterRequest
 
 DATABASE = "src/database/users.db"
 
@@ -31,7 +28,7 @@ async def user_exists(username: str) -> bool:
         async with db.execute("SELECT 1 FROM users WHERE username = ?", (username,)) as cursor:
             return await cursor.fetchone() is not None
 
-async def get_user(login: LoginRequest, hashed_pass):
+async def get_user():
     async with aiosqlite.connect(DATABASE) as db:
         async with db.execute(
             f"SELECT id, username, avatar_url FROM users WHERE username = ? AND password = ?",
@@ -56,7 +53,7 @@ async def get_user_all(username: str):
         return {"status": "true", "data": row}
 
 
-async def add_user(reg: RegisterRequest, hashed_pass: str, id: int):
+async def add_user():
     username = reg.username
     async with aiosqlite.connect(DATABASE) as db:
         user_exist = await user_exists(username)

@@ -30,6 +30,7 @@
       <span id="closeModal" class="close">&times;</span>
       <h2>Новый пост</h2>
       <form id="postForm">
+        <input type="text" id="postUser" placeholder="Пользователь" required>
         <input type="text" id="postTitle" placeholder="Заголовок" required>
         <textarea id="postContent" placeholder="Содержание" required></textarea>
         <input type="text" id="postCategory" placeholder="Категория" required>
@@ -67,6 +68,7 @@
       const postForm = document.getElementById("postForm");
       postForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+        const username = document.getElementById("postUser").value.trim()
         const title = document.getElementById("postTitle").value.trim();
         const content = document.getElementById("postContent").value.trim();
         const category = document.getElementById("postCategory").value.trim();
@@ -75,7 +77,7 @@
         const tags = tagsInput ? tagsInput.split(",").map(tag => tag.trim()).filter(tag => tag) : [];
         
         if (title && content && category) {
-          await createPost({ title, content, category, tags, image_url: imageUrl || null });
+          await createPost({ username, title, content, category, tags, image_url: imageUrl || null });
           postForm.reset();
           modal.style.display = "none"; // Закрываем модальное окно после создания поста
           getAllPosts();

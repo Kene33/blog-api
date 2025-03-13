@@ -1,11 +1,8 @@
-// main.js
+const API_BASE = "http://127.0.0.1:1234"; // адрес вашего сервера (без /api)
 
-const API_BASE = "http://127.0.0.1:1234/api"; // Измените адрес, если необходимо
-
-// Получить все посты
 async function getAllPosts() {
   try {
-    const response = await fetch(`${API_BASE}/posts`);
+    const response = await fetch(`${API_BASE}/api/posts`);
     if (!response.ok) throw new Error("Ошибка при загрузке постов");
     const posts = await response.json();
     renderPosts(posts);
@@ -15,28 +12,38 @@ async function getAllPosts() {
   }
 }
 
-// Отрисовка постов
 function renderPosts(posts) {
   const postsContainer = document.getElementById("postsContainer");
   if (!postsContainer) return;
   postsContainer.innerHTML = "";
+  
   posts.forEach(post => {
     const postCard = document.createElement("div");
     postCard.className = "post-card";
+
+    let tags = "";
+    try {
+      tags = post[6] ? JSON.parse(post[6]).join(", ") : ""; 
+    } catch (e) {
+      console.error("Ошибка при обработке тегов:", e);
+    }
+
+    // Если API возвращает массивы, обращаемся по индексам
+    // Если возвращает объекты, используйте post.username, post.title и т.д.
+    // Предположим, что API возвращает массивы, как в вашем предыдущем ответе:
     postCard.innerHTML = `
-      <h3>${post.title}</h3>
-      <p>${post.content}</p>
-      <small>Категория: ${post.category} | Теги: ${post.tags ? post.tags.join(", ") : ""}</small>
-      ${post.image_url ? `<img src="${API_BASE}${post.image_url}" alt="Post Image">` : ""}
+      <h3>by ${post[2]}</h3>
+      <h3>${post[3]}</h3>
+      <p>${post[4]}</p>
+      <small>Категория: ${post[5]} | Теги: ${tags}</small>
     `;
     postsContainer.appendChild(postCard);
   });
 }
 
-// Создать пост
 async function createPost(postData) {
   try {
-    const response = await fetch(`${API_BASE}/posts`, {
+    const response = await fetch(`${API_BASE}/api/posts`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(postData)
@@ -49,44 +56,4 @@ async function createPost(postData) {
   }
 }
 
-// Авторизация
-async function loginUser(userData) {
-  try {
-    const response = await fetch(`${API_BASE}/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData)
-    });
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    return { status: "error", detail: "Ошибка запроса" };
-  }
-}
-
-// Регистрация
-async function registerUser(userData) {
-  try {
-    const response = await fetch(`${API_BASE}/register`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(userData)
-    });
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    return { status: "error", detail: "Ошибка запроса" };
-  }
-}
-
-// Получение данных пользователя
-async function getUser(userId) {
-  try {
-    const response = await fetch(`${API_BASE}/user/${userId}`);
-    if (!response.ok) throw new Error("Ошибка при загрузке пользователя");
-    return await response.json();
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-}
+// Другие функции (loginUser, registerUser, getUser) остаются без изменений

@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from src.api.posts import router as posts_router
+from src.api.posts_2 import router as posts_router
 from src.api.users import router as users_router
 
 api_router = APIRouter()

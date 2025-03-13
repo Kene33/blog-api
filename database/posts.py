@@ -9,13 +9,13 @@ async def create_database() -> None:
         create_table_query = f'''
         CREATE TABLE IF NOT EXISTS posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id TEXT NOT NULL,
+        user_id INTEGER NOT NULL,
+        username TEXT NOT NULL,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
         category TEXT NOT NULL,
-        tags JSON,
+        tags TEXT,
         createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL,
         image_url TEXT
         )
         '''
@@ -52,23 +52,23 @@ async def get_posts(user_id: int = None, posts_id: int = None, tag: str = None) 
                 rows = await cursor.fetchall()
                 return rows
 
-async def add_posts(user_id: int, title: str, content: str, category: str, tags: list, createdAt: int, updatedAt: int, image_url: str) -> bool:
+async def add_posts(user_id: int, username: str, title: str, content: str, category: str, tags: list, createdAt: int, image_url: str) -> bool:
     try:
         async with aiosqlite.connect(DATABASE) as db:
             tags_json = json.dumps(tags)
 
             await db.execute(f'''
-            INSERT INTO posts (user_id, title, content, category, tags, createdAt, updatedAt, image_url) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-            ''', (title, user_id, content, category, tags_json, createdAt, updatedAt, image_url))
+            INSERT INTO posts (user_id, username, title, content, category, tags, createdAt, image_url) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (user_id, username, title, content, category, tags_json, createdAt, image_url))
 
             await db.commit()
-        
-            return True
-    except:
-        return False
 
-    
+            return {"status": True}
+    except Exception as e:
+        return {"status": False, "info": e}
+
+
 async def update_posts(user_id: int, title: str, content: str, category: str, tags: list, updatedAt: int, post_id: int) -> dict:
     try:
         async with aiosqlite.connect(DATABASE) as db:
