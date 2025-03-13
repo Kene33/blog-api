@@ -1,3 +1,4 @@
+from typing import Optional
 import aiosqlite
 import json
 
@@ -33,24 +34,21 @@ async def check_user_exists(user_id: int) -> bool:
 
             return False
 
-async def get_posts(user_id: int = None, posts_id: int = None, tag: str = None) -> dict:
+async def get_posts(user_id: int, post_id: Optional[int] = None, tag: Optional[str] = None):
+    base_query = "SELECT * FROM posts WHERE user_id = ?"
+    params = [user_id]
+
+    if post_id is not None:
+        base_query += " AND id = ?"
+        params.append(post_id)
+    if tag is not None:
+        base_query += " AND tags LIKE ?"
+        params.append(f"%{tag}%")
+
     async with aiosqlite.connect(DATABASE) as db:
-        if posts_id and user_id:
-            async with db.execute(f'SELECT * FROM posts WHERE id = ? AND user_id = ?', (posts_id, user_id)) as cursor:
-                rows = await cursor.fetchone()
-                return rows
-        elif tag and user_id:
-            async with db.execute(f'SELECT * FROM posts WHERE tags LIKE ? AND user_id = ?', (tag, user_id)) as cursor:
-                rows = await cursor.fetchone()
-                return rows
-        elif user_id:
-            async with db.execute(f'SELECT * FROM posts AND user_id = ?') as cursor:
-                rows = await cursor.fetchall()
-                return rows
-        else:
-            async with db.execute(f'SELECT * FROM posts') as cursor:
-                rows = await cursor.fetchall()
-                return rows
+        async with db.execute(base_query, tuple(params)) as cursor:
+            rows = await cursor.fetchall()
+            return rows
 
 async def add_posts(user_id: int, username: str, title: str, content: str, category: str, tags: list, createdAt: int, image_url: str) -> bool:
     try:
