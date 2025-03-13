@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, Response
+from fastapi import APIRouter, HTTPException, Response
 from authx import AuthX, AuthXConfig
 
 from src.database.posts import *
