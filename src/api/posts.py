@@ -20,7 +20,7 @@ async def get_posts_by_user(
     post_id: int | None = Query(None, description="ID поста (опционально)"), 
     tag: str | None = Query(None, description="Фильтр по тегу (опционально)")
 ):
-    result = await db_posts.get_posts_by_user(user_id, post_id, tag)
+    result = await db_posts.get_posts(user_id, post_id, tag)
     return result
 
 @router.post("/api/posts", tags=["POST"], summary="Создание публикации")
