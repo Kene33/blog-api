@@ -5,6 +5,7 @@ from src.database.posts import *
 from src.schemas.users import UserLoginSchema
 
 router = APIRouter()
+
 config = AuthXConfig()
 config.JWT_SECRET_KEY = "secret_12345_key"
 config.JWT_ACCESS_COOKIE_NAME = "jwt_key"

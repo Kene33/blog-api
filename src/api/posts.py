@@ -1,20 +1,20 @@
-import os
-import hashlib
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from src.database import posts as db_posts
-from src.schemas.posts import Posts, update_Posts
+from src.schemas.posts import Posts
+
+from src.api.users import security
 
 router = APIRouter()
 
 
-@router.get("/api/posts", tags=["GET"], summary="Получить все посты")
+@router.get("/api/posts", tags=["GET"], summary="Получить все посты", dependencies=[Depends(security.access_token_required)])
 async def get_all_posts():
     all_posts = await db_posts.get_posts()
     return all_posts
 
 
-@router.get("/api/posts/user/{user_id}", tags=["GET"], summary="Получить посты пользователя")
+@router.get("/api/posts/user/{user_id}", tags=["GET"], summary="Получить посты пользователя", dependencies=[Depends(security.access_token_required)])
 async def get_posts_by_user(
     user_id: int, 
     post_id: int | None = Query(None, description="ID поста (опционально)"), 
@@ -23,7 +23,7 @@ async def get_posts_by_user(
     result = await db_posts.get_posts(user_id, post_id, tag)
     return result
 
-@router.post("/api/posts", tags=["POST"], summary="Создание публикации")
+@router.post("/api/posts", tags=["POST"], summary="Создание публикации", dependencies=[Depends(security.access_token_required)])
 async def add_post(data: Posts):
     data = data.model_dump()
 
@@ -45,7 +45,7 @@ async def add_post(data: Posts):
     raise HTTPException(status_code=400, detail="Error adding post")
 
 
-@router.delete("/api/posts", tags=["DELETE"], summary="Удалить публикацию")
+@router.delete("/api/posts", tags=["DELETE"], summary="Удалить публикацию", dependencies=[Depends(security.access_token_required)])
 async def delete_post(post_id: int = Query(...), user_id: int = Query(...)):
     delete_result = await db_posts.delete_posts(user_id, post_id)
     if delete_result is True:
