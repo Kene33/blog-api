@@ -1,81 +1,84 @@
 import aiosqlite
 import json
 
-async def create_database(user_id: int) -> None:
-    async with aiosqlite.connect('app/database/database.db') as db:
+DATABASE = "src/database/database.db"
+
+
+async def create_database() -> None:
+    async with aiosqlite.connect(DATABASE) as db:
         create_table_query = f'''
-        CREATE TABLE IF NOT EXISTS posts_{user_id} (
+        CREATE TABLE IF NOT EXISTS posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id TEXT NOT NULL,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
         category TEXT NOT NULL,
         tags JSON,
         createdAt TEXT NOT NULL,
-        updatedAt TEXT NOT NULL
+        updatedAt TEXT NOT NULL,
+        image_url TEXT
         )
         '''
 
         await db.execute(create_table_query)
         await db.commit()
 
-async def check_user_exists(user_id: int) -> bool:
-    table_name = f"posts_{user_id}"
 
-    async with aiosqlite.connect('app/database/database.db') as db:
-        async with db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name=?", (table_name,)) as cursor:
+async def check_user_exists(user_id: int) -> bool:
+    async with aiosqlite.connect(DATABASE) as db:
+        async with db.execute("SELECT * FROM posts WHERE user_id = ?", (user_id,)) as cursor:
             result = await cursor.fetchone()
             if result:
                 return True
-            
+
             return False
 
-async def get_posts(user_id: int, posts_id: int = None, tag: str = None) -> dict:
-    table_name = f"posts_{user_id}"
-
-    async with aiosqlite.connect('app/database/database.db') as db:
-
-        if posts_id:
-            async with db.execute(f'SELECT * FROM {table_name} WHERE id = ?', (posts_id,)) as cursor:
+async def get_posts(user_id: int = None, posts_id: int = None, tag: str = None) -> dict:
+    async with aiosqlite.connect(DATABASE) as db:
+        if posts_id and user_id:
+            async with db.execute(f'SELECT * FROM posts WHERE id = ? AND user_id = ?', (posts_id, user_id)) as cursor:
                 rows = await cursor.fetchone()
                 return rows
-        elif tag:
-            async with db.execute(f'SELECT * FROM {table_name} WHERE tags LIKE ?', (tag,)) as cursor:
+        elif tag and user_id:
+            async with db.execute(f'SELECT * FROM posts WHERE tags LIKE ? AND user_id = ?', (tag, user_id)) as cursor:
                 rows = await cursor.fetchone()
                 return rows
-        else:
-            async with db.execute(f'SELECT * FROM {table_name}') as cursor:
+        elif user_id:
+            async with db.execute(f'SELECT * FROM posts AND user_id = ?') as cursor:
                 rows = await cursor.fetchall()
                 return rows
-            
-async def add_posts(user_id: int, title: str, content: str, category: str, tags: list, createdAt: int, updatedAt: int) -> bool:
-    table_name = f"posts_{user_id}"
+        else:
+            async with db.execute(f'SELECT * FROM posts') as cursor:
+                rows = await cursor.fetchall()
+                return rows
+
+async def add_posts(user_id: int, title: str, content: str, category: str, tags: list, createdAt: int, updatedAt: int, image_url: str) -> bool:
     try:
-        async with aiosqlite.connect('app/database/database.db') as db:
+        async with aiosqlite.connect(DATABASE) as db:
             tags_json = json.dumps(tags)
 
             await db.execute(f'''
-            INSERT INTO {table_name} (title, content, category, tags, createdAt, updatedAt) 
-            VALUES (?, ?, ?, ?, ?, ?)
-            ''', (title, content, category, tags_json, createdAt, updatedAt))
+            INSERT INTO posts (user_id, title, content, category, tags, createdAt, updatedAt, image_url) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (title, user_id, content, category, tags_json, createdAt, updatedAt, image_url))
 
             await db.commit()
         
             return True
     except:
         return False
+
     
 async def update_posts(user_id: int, title: str, content: str, category: str, tags: list, updatedAt: int, post_id: int) -> dict:
-    table_name = f"posts_{user_id}"
-
     try:
-        async with aiosqlite.connect('app/database/database.db') as db:
+        async with aiosqlite.connect(DATABASE) as db:
             tags_json = json.dumps(tags)
 
             await db.execute(f'''
-            UPDATE {table_name}
+            UPDATE posts
             SET title = ?, content = ?, category = ?, tags = ?, updatedAt = ?
-            WHERE id = ?
-            ''', (title, content, category, tags_json, updatedAt, post_id))
+            WHERE id = ? AND user_id = ?
+            ''', (title, content, category, tags_json, updatedAt, post_id, user_id))
 
             await db.commit()
 
@@ -84,10 +87,9 @@ async def update_posts(user_id: int, title: str, content: str, category: str, ta
         return False
 
 async def delete_posts(user_id: int, post_id: int) -> bool:
-    table_name = f"posts_{user_id}"
     try:
-        async with aiosqlite.connect('app/database/database.db') as db:
-            await db.execute(f"DELETE FROM {table_name} WHERE id = ?", (post_id,))
+        async with aiosqlite.connect(DATABASE) as db:
+            await db.execute(f"DELETE FROM posts WHERE id = ? AND user_id = ?", (post_id, user_id))
             await db.commit()
 
             return True
@@ -95,29 +97,16 @@ async def delete_posts(user_id: int, post_id: int) -> bool:
         return False
 
 async def find_posts_by_tag(tag: str, user_id: int = None) -> dict:
-    async with aiosqlite.connect('app/database/database.db') as db:
-        tables_query = "SELECT name FROM sqlite_master WHERE type='table';"
-        async with db.execute(tables_query) as cursor:
-            tables = await cursor.fetchall()
-        
-        results = []
-        
-        for table in tables:
-            table_name = table[0]
-            
-            columns_query = f"PRAGMA table_info({table_name});"
-            async with db.execute(columns_query) as col_cursor:
-                columns = await col_cursor.fetchall()
-                if any(col[1] == 'tags' for col in columns):
-                    
-                    query = f"SELECT * FROM {table_name} WHERE tags LIKE ?"
-                    like_pattern = f'%{tag}%'
-                    async with db.execute(query, (like_pattern,)) as search_cursor:
-                        rows = await search_cursor.fetchall()
-                        if rows:
-                            results.extend(rows)
+    async with aiosqlite.connect(DATABASE) as db:
+        if user_id:
+            query = "SELECT * FROM posts WHERE tags LIKE ? AND user_id = ?"
+        else:
+            query = "SELECT * FROM posts WHERE tags LIKE ?"
+        param = f"%{tag}%"
+        async with db.execute(query, (param,)) as cursor:
+            rows = await cursor.fetchall()
+            return rows
 
-        return results
     
 
 

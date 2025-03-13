@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Профиль</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Профиль пользователя</h1>
+    <nav>
+      <a href="index.html">Главная</a>
+      <a href="login.html">Вход</a>
+      <a href="register.html">Регистрация</a>
+    </nav>
+  </header>
+  <main>
+    <section class="profile-section">
+      <div id="profileInfo">
+        <!-- Информация о пользователе загрузится сюда -->
+      </div>
+    </section>
+  </main>
+  <script src="main.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const userId = localStorage.getItem("userId");
+      const profileInfo = document.getElementById("profileInfo");
+      if (!userId) {
+        profileInfo.innerHTML = "<p>Пользователь не авторизован.</p>";
+        return;
+      }
+      const user = await getUser(userId);
+      if(user) {
+        profileInfo.innerHTML = `
+          <h2>${user.name}</h2>
+          <p>Username: ${user.username}</p>
+          ${user.avatar_url ? `<img src="${user.avatar_url}" alt="Avatar" class="avatar">` : ""}
+        `;
+      } else {
+        profileInfo.innerHTML = "<p>Ошибка загрузки данных пользователя.</p>";
+      }
+    });
+  </script>
+</body>
+</html>

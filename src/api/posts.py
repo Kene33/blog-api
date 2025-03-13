@@ -1,10 +1,20 @@
+import os
+import hashlib
+
 from fastapi import APIRouter
 from datetime import datetime
 
-from src.database import posts
+from src.database import posts, user
 from src.schemas.posts import Posts, update_Posts
+from src.schemas.users import LoginRequest, RegisterRequest
 
 router = APIRouter()
+
+
+@router.get("/api/posts")
+async def get_all_posts():
+    all_posts = await posts.get_all_posts()
+    return all_posts
 
 @router.post("/api/posts/{user_id}", tags=["POST"], summary="Добавление публикации")
 async def add_posts(data: Posts, user_id: int):
@@ -20,16 +30,17 @@ async def add_posts(data: Posts, user_id: int):
     tags = data['tags']
     createdAt = formatted_time
     updatedAt = formatted_time
+    img = data['image_url']
 
     user_exists = await posts.check_user_exists(user_id)
     if not user_exists:
         await posts.create_database(user_id)
         await posts.add_posts(
-            user_id, title, content, category, tags, createdAt, updatedAt
+            user_id, title, content, category, tags, createdAt, updatedAt, img
             )
     else:
         await posts.add_posts(
-            user_id, title, content, category, tags, createdAt, updatedAt
+            user_id, title, content, category, tags, createdAt, updatedAt, img
             )
         
     return {"ok": True, "info": "Task added successfully"}
