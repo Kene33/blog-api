@@ -34,23 +34,36 @@ async def check_user_exists(user_id: int) -> bool:
             return False
 
 async def get_posts(user_id: Optional[int] = None, post_id: Optional[int] = None, tag: Optional[str] = None):
-    if user_id:
-        base_query = "SELECT * FROM posts WHERE user_id = ?"
-    else:
-        base_query = "SELECT * FROM posts"
-        async with aiosqlite.connect(DATABASE) as db:
-            async with db.execute(base_query) as cursor:
-                rows = await cursor.fetchall()
-                return rows
-    params = [user_id]
-
+    base_query = "SELECT * FROM posts"
+    params = []
+    
+    # Фильтруем по user_id, если он передан
+    if user_id is not None:
+        base_query += " WHERE user_id = ?"
+        params.append(user_id)
+    
+    # Добавляем фильтрацию по post_id, если он передан
     if post_id is not None:
-        base_query += " AND id = ?"
+        # Если уже был WHERE, то используем AND для добавления условия
+        if params:
+            base_query += " AND id = ?"
+        else:
+            base_query += " WHERE id = ?"
         params.append(post_id)
+    
+    # Добавляем фильтрацию по tag, если он передан
     if tag is not None:
-        base_query += " AND tags LIKE ?"
+        # Если уже был WHERE, то используем AND для добавления условия
+        if params:
+            base_query += " AND tags LIKE ?"
+        else:
+            base_query += " WHERE tags LIKE ?"
         params.append(f"%{tag}%")
-
+    
+    # Сортируем по дате
+    base_query += " ORDER BY createdAt DESC"
+    
+    # Выполнение запроса
     async with aiosqlite.connect(DATABASE) as db:
         async with db.execute(base_query, tuple(params)) as cursor:
             rows = await cursor.fetchall()

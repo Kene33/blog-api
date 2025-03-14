@@ -7,4 +7,4 @@ class Posts(BaseModel):
     content: str
     category: str
     tags: List[str]
-    image_url: Optional[str] = None
+    image_url: str | None = None  
