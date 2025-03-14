@@ -1,9 +1,11 @@
 import uvicorn
+import asyncio
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from src.api import api_router
+from src.database import posts, users
 
 
 app = FastAPI(title="BLOG AP123I", description="CRUD API for blog.")
@@ -11,12 +13,16 @@ app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://127.0.0.1:5500", "http://127.0.0.1:4000"],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  
+    allow_headers=["*"],  
 )
 
+async def on_startup():
+    await posts.create_database()
+    await users.create_database()
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", reload=True, host = "127.0.0.1", port = 8000)
+    asyncio.run(on_startup())
+    uvicorn.run("main:app", reload=True, host = "127.0.0.1", port = 4000)

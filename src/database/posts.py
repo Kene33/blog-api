@@ -10,7 +10,6 @@ async def create_database() -> None:
         create_table_query = f'''
         CREATE TABLE IF NOT EXISTS posts (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
         username TEXT NOT NULL,
         title TEXT NOT NULL,
         content TEXT NOT NULL,
@@ -57,15 +56,15 @@ async def get_posts(user_id: Optional[int] = None, post_id: Optional[int] = None
             rows = await cursor.fetchall()
             return rows
 
-async def add_posts(user_id: int, username: str, title: str, content: str, category: str, tags: list, createdAt: int, image_url: str) -> bool:
+async def add_posts(username: str, title: str, content: str, category: str, tags: list, createdAt: int, image_url: str) -> bool:
     try:
         async with aiosqlite.connect(DATABASE) as db:
             tags_json = json.dumps(tags)
 
             await db.execute(f'''
-            INSERT INTO posts (user_id, username, title, content, category, tags, createdAt, image_url) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (user_id, username, title, content, category, tags_json, createdAt, image_url))
+            INSERT INTO posts (username, title, content, category, tags, createdAt, image_url) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+            ''', (username, title, content, category, tags_json, createdAt, image_url))
 
             await db.commit()
 

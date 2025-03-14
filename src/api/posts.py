@@ -8,7 +8,7 @@ from src.api.users import security
 router = APIRouter()
 
 
-@router.get("/api/posts", tags=["GET"], summary="Получить все посты", dependencies=[Depends(security.access_token_required)])
+@router.get("/api/posts", tags=["GET"], summary="Получить все посты") # dependencies=[Depends(security.access_token_required)]
 async def get_all_posts():
     all_posts = await db_posts.get_posts()
     return all_posts
@@ -32,14 +32,13 @@ async def add_post(data: Posts):
     title = data['title']
     content = data['content']
     username = data['username']
-    user_id = data['user_id']
     category = data['category']
     tags = data['tags']
     image_url = data.get('image_url')
     createdAt = current_time
 
     await db_posts.create_database()
-    added_post = await db_posts.add_posts(user_id, username, title, content, category, tags, createdAt, image_url)
+    added_post = await db_posts.add_posts(username, title, content, category, tags, createdAt, image_url)
     if added_post.get("status"):
         return {"ok": True, "info": "Post added successfully"}
     raise HTTPException(status_code=400, detail="Error adding post")
