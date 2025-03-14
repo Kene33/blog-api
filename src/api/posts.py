@@ -1,5 +1,7 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, Query
+import os
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
+from fastapi.staticfiles import StaticFiles
 from src.database import posts as db_posts
 from src.schemas.posts import Posts
 
@@ -7,6 +9,11 @@ from src.api.users import security
 
 router = APIRouter()
 
+UPLOAD_DIR = "src/database/images/posts"
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
+
+router.mount("/media", StaticFiles(directory=UPLOAD_DIR), name="media")
 
 @router.get("/api/posts", tags=["GET"], summary="Получить все посты") # dependencies=[Depends(security.access_token_required)]
 async def get_all_posts():
@@ -24,7 +31,7 @@ async def get_posts_by_user(
     return result
 
 @router.post("/api/posts", tags=["POST"], summary="Создание публикации", dependencies=[Depends(security.access_token_required)])
-async def add_post(data: Posts):
+async def add_post(data: Posts, file: UploadFile = File(None)):
     data = data.model_dump()
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
