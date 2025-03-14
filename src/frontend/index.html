@@ -37,20 +37,12 @@
         <input type="text" id="postTags" placeholder="Теги (через запятую)">
         <!--<input type="text" id="postImageUrl"> -->
         <!--<input type="file" id="postMedia" accept="image/*,video/*", placeholder="Изображение (опционально)"</input> -->
-        <div class="file-upload">
-          <!-- Скрытый input для загрузки файла -->
-          <input type="file" id="fileInput" accept="image/*,video/*">
-          <!-- Кастомная кнопка для выбора файла -->
-          <label for="fileInput" class="custom-file-label">Выберите файл</label>
-          <!-- Блок для предпросмотра файла -->
-          <div id="filePreview" class="file-preview"></div>
-        </div>
         <button type="submit">Добавить пост</button>
       </form>
     </div>
   </div>
 
-  <script src="api.js"></script>
+  <script src="main.js"></script>
   <script>
     document.addEventListener("DOMContentLoaded", () => {
     const postContainer = document.getElementById("postContainer");
@@ -91,7 +83,8 @@
         const content = document.getElementById("postContent").value.trim();
         const category = document.getElementById("postCategory").value.trim();
         const tagsInput = document.getElementById("postTags").value.trim();
-        const imageUrl = document.getElementById("postImageUrl").value.trim();
+        // const imageUrl = document.getElementById("postImageUrl").value.trim();
+        const imageUrl = null;
         const tags = tagsInput ? tagsInput.split(",").map(tag => tag.trim()).filter(tag => tag) : [];
 
         if (title && content && category) {
