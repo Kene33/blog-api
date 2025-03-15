@@ -31,7 +31,7 @@ async def get_posts_by_user(
     return result
 
 @router.post("/api/posts", tags=["POST"], summary="Создание публикации", dependencies=[Depends(security.access_token_required)])
-async def add_post(data: Posts, file: UploadFile = File(None)):
+async def add_post(data: Posts): # file: UploadFile = File(None)
     data = data.model_dump()
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -41,7 +41,7 @@ async def add_post(data: Posts, file: UploadFile = File(None)):
     username = data['username']
     category = data['category']
     tags = data['tags']
-    image_url = data.get('image_url')
+    image_url = None
     createdAt = current_time
 
     await db_posts.create_database()

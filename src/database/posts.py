@@ -69,7 +69,7 @@ async def get_posts(user_id: Optional[int] = None, post_id: Optional[int] = None
             rows = await cursor.fetchall()
             return rows
 
-async def add_posts(username: str, title: str, content: str, category: str, tags: list, createdAt: int, image_url: str) -> bool:
+async def add_posts(username: str, title: str, content: str, category: str, tags: list, createdAt: int, image_url: str | None) -> bool:
     try:
         async with aiosqlite.connect(DATABASE) as db:
             tags_json = json.dumps(tags)

@@ -70,7 +70,10 @@ async function renderPosts(posts) {
     const postCard = document.createElement("div");
     postCard.classList.add("post");
     postCard.innerHTML = `
-      <h3 style="font-size: 0.8em;">by ${post[1]}</h3>
+      <h3 style="font-size: 0.8em;">
+        <span style="color: #888;">by </span>
+        <span>${post[1]}</span>
+      </h3>
       <h3>${post[2]}</h3>
       <p>${post[3]}</p>
       <small>Категория: ${post[4]} | Теги: ${Array.isArray(tags) ? tags.join(", ") : "Нет тегов"}</small>
@@ -89,8 +92,14 @@ async function createPost(postData) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(postData)
     });
-    if (!response.ok) throw new Error("Ошибка при создании поста");
+    
+    if (response.status === 401) {
+      // Если сервер вернул 401, выводим сообщение о том, что пользователь не авторизован
+      alert("Вы не вошли в аккаунт");
+      return;
+    }
     console.log(JSON.stringify(postData))
+    if (!response.ok) throw new Error("Ошибка при создании поста");
     return await response.json();
   } catch (error) {
     console.error(error);
