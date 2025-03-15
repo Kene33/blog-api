@@ -1,3 +1,4 @@
+import hashlib
 import aiosqlite
 
 DATABASE = "src/database/users.db"
@@ -23,8 +24,6 @@ async def user_exists(username: str) -> bool:
                     return True
                 else:
                     return False
-
-
 
 
 async def add_user(username: str, password: str, createdAt: str = None, avatar_url: str = None):

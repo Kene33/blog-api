@@ -81,9 +81,9 @@ async def add_posts(username: str, title: str, content: str, category: str, tags
 
             await db.commit()
 
-            return {"status": True}
+            return {"ok": True}
     except Exception as e:
-        return {"status": False, "info": e}
+        return {"ok": False, "message": e}
 
 
 async def update_posts(user_id: int, title: str, content: str, category: str, tags: list, updatedAt: int, post_id: int) -> dict:

@@ -47,7 +47,7 @@ async def add_post(data: Posts): # file: UploadFile = File(None)
     await db_posts.create_database()
     added_post = await db_posts.add_posts(username, title, content, category, tags, createdAt, image_url)
     if added_post.get("status"):
-        return {"ok": True, "info": "Post added successfully"}
+        return {"ok": True, "message": "Post added successfully"}
     raise HTTPException(status_code=400, detail="Error adding post")
 
 
@@ -55,7 +55,7 @@ async def add_post(data: Posts): # file: UploadFile = File(None)
 async def delete_post(post_id: int = Query(...), user_id: int = Query(...)):
     delete_result = await db_posts.delete_posts(user_id, post_id)
     if delete_result is True:
-        return {"ok": True, "info": "Post deleted successfully"}
+        return {"ok": True, "message": "Post deleted successfully"}
     raise HTTPException(status_code=400, detail="Error deleting post")
 
 @router.get("/api/posts/tag/{tag}", tags=["GET"], summary="Найти посты по тегу")
