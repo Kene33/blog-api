@@ -95,6 +95,18 @@
           alert("Заполните обязательные поля: заголовок, содержание и категорию.");
         }
       });
+
+      const token = localStorage.getItem("access_token");
+      const navLinks = document.getElementById("navLinks");
+
+      if (token) {
+        navLinks.innerHTML = `<a href="profile.html">Профиль</a>`;
+      } else {
+        navLinks.innerHTML = `
+          <a href="login.html">Вход</a>
+          <a href="register.html">Регистрация</a>
+        `;
+      }
     });
   </script>
 </body>

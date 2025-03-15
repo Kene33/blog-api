@@ -34,7 +34,7 @@ async def add_user(username: str, password: str, createdAt: str = None, avatar_u
                 INSERT INTO users (username, password, createdAt, avatar_url) VALUES (?, ?, ?, ?)
             """, (username, password, createdAt, avatar_url))
             await db.commit()
-            return {"status": True, "message": "User added successfully"}
+            return {"ok": True, "message": "User added successfully"}
         except aiosqlite.IntegrityError:
-            return {"status": False, "message": "Username is already exists"}
+            return {"ok": False, "message": "Username is already exists"}
 

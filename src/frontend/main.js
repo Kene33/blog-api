@@ -116,11 +116,13 @@ async function loginUser(userData) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData)
     });
-    alert("Вход выполнен успешно!")
-    loginMessage.textContent = result;
-    localStorage.setItem("userId", result.user.id);
-    window.location.href = "index.html";
-    return await response.json();
+    const result = await response.json();
+    if (result.ok && result.access_token) {
+      localStorage.setItem("access_token", result.access_token);
+      // Перенаправляем пользователя, например, на профиль
+      window.location.href = "profile.html";
+    }
+    return result;
   } catch (error) {
     console.error(error);
     return { status: "error", detail: "Ошибка запроса" };
