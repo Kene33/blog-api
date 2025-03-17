@@ -23,14 +23,19 @@ header h1 {
 }
 
 nav a {
-  margin-left: 15px;
-  text-decoration: none;
-  color: #0079d3;
-  font-weight: bold;
+  width: 100%;
+  padding: 10px;
+  background: #ff4500;
+  border: none;
+  border-radius: 5px;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
 nav a:hover {
-  text-decoration: underline;
+  background: #e03e00;
 }
 
 main {
