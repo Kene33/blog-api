@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Response
+from fastapi import APIRouter, Depends, Response
 from authx import AuthX, AuthXConfig
 
 from src.database import users as users_db
@@ -15,20 +15,30 @@ config.JWT_CSRF_METHODS = []
 
 security = AuthX(config=config)
 
+
+@router.post("/api/user/{user_id}", dependencies=[Depends(security.access_token_required)])
+async def user_page(username: str):
+    user_exist = await users_db.get_user(username)
+    if user_exist:
+        return user_exist
+    
+    return {"ok": False, "message": "Cant find user"}
+
+
 @router.post("/login")
 async def login(creds: UserLoginSchema, response: Response):
-    user_exist = await users_db.user_exists(creds.username)
+    user_exist = await users_db.get_user(creds.username)
     if creds.username == "test" and creds.password == "test":
         token = security.create_access_token(uid="136474", expiry=timedelta(hours=12))
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token, samesite="lax", httponly=True)
         return {"ok": True, "access_token": token}
 
-    if user_exist:
+    if user_exist["ok"]:
         token = security.create_access_token(uid=creds.username, expiry=timedelta(hours=12))
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token, samesite="lax", httponly=True)
         return {"ok": True, "access_token": token}
     
-    return {"ok": False, "message": "Username is already exists"}
+    return {"ok": False, "message": "Wrong password or username"}
 
 ### dependencies=[Depends(security.access_token_required)]
 
@@ -38,9 +48,8 @@ async def register(creds: UserLoginSchema): # file: UploadFile
 
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    user_exists = await users_db.user_exists(creds.username)
-    if user_exists: return {"ok": False, "message": "Username already exists"}
+    user_exists = await users_db.get_user(creds.username)
+    if user_exists["ok"]: return {"ok": False, "message": "Username already exists"}
 
     user = await users_db.add_user(creds.username, creds.password, current_time, None)
     return user
-# # #

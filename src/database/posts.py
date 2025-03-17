@@ -16,7 +16,9 @@ async def create_database() -> None:
         category TEXT NOT NULL,
         tags TEXT,
         createdAt TEXT NOT NULL,
-        image_url TEXT
+        image_url TEXT,
+        FOREIGN KEY (username) REFERENCES users(id) ON DELETE CASCADE,
+        UNIQUE (username, title)  -- Запрещает одинаковые названия у одного пользователя
         )
         '''
 
@@ -84,24 +86,6 @@ async def add_posts(username: str, title: str, content: str, category: str, tags
             return {"ok": True}
     except Exception as e:
         return {"ok": False, "message": e}
-
-
-async def update_posts(user_id: int, title: str, content: str, category: str, tags: list, updatedAt: int, post_id: int) -> dict:
-    try:
-        async with aiosqlite.connect(DATABASE) as db:
-            tags_json = json.dumps(tags)
-
-            await db.execute(f'''
-            UPDATE posts
-            SET title = ?, content = ?, category = ?, tags = ?, updatedAt = ?
-            WHERE id = ? AND user_id = ?
-            ''', (title, content, category, tags_json, updatedAt, post_id, user_id))
-
-            await db.commit()
-
-            return True
-    except:
-        return False
 
 async def delete_posts(user_id: int, post_id: int) -> bool:
     try:

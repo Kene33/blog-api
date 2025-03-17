@@ -3,6 +3,7 @@ import os
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.staticfiles import StaticFiles
 from src.database import posts as db_posts
+from src.database import users as db_users
 from src.schemas.posts import Posts
 
 from src.api.users import security
@@ -45,8 +46,10 @@ async def add_post(data: Posts): # file: UploadFile = File(None)
     createdAt = current_time
 
     await db_posts.create_database()
+    await db_users.posts_counter(username)
     added_post = await db_posts.add_posts(username, title, content, category, tags, createdAt, image_url)
-    if added_post.get("status"):
+    print(added_post)
+    if added_post["ok"]:
         return {"ok": True, "message": "Post added successfully"}
     raise HTTPException(status_code=400, detail="Error adding post")
 
