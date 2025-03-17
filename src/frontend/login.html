@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Вход</title>
+  <link rel="stylesheet" href="login.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,17 +14,15 @@
       <a href="register.html">Регистрация</a>
     </nav>
   </header>
-  <main>
-    <section class="form-section">
-      <form id="loginForm">
-        <input type="text" id="loginUsername" placeholder="Имя пользователя" required>
-        <input type="password" id="loginPassword" placeholder="Пароль" required>
-        <button type="submit">Войти</button>
-      </form>
-      <div id="loginMessage"></div>
-    </section>
-  </main>
-  <!-- Подключаем основной JS-файл, где определена функция loginUser -->
+
+  <div class="form-container">
+    <form id="loginForm">
+      <input type="text" id="loginUsername" placeholder="Имя пользователя" required>
+      <input type="password" id="loginPassword" placeholder="Пароль" required>
+      <button type="submit">Войти</button>
+    </form>
+  </div>
+
   <script src="main.js"></script>
   <script>
     // Обработчик отправки формы входа

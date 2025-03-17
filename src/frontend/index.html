@@ -75,13 +75,9 @@
       getAllPosts();
 
       const storedUser = localStorage.getItem("userId");
-  
-      // Проверяем, если пользователь не найден, перенаправляем на страницу входа
-      if (!storedUser) {
-        window.location.href = "login.html";
-        return;
-      }
-
+      if (!storedUser && openModalBtn) {
+        openModalBtn.style.display = "none"; // Скрываем кнопку
+    }
       // Устанавливаем значение поля формы для создания поста
       const postUserInput = document.getElementById("postUser");
       if (postUserInput) {
