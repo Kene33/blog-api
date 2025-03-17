@@ -1,6 +1,9 @@
+import sqlite3
 from typing import Optional
 import aiosqlite
 import json
+
+from fastapi import HTTPException
 
 DATABASE = "src/database/database.db"
 
@@ -84,6 +87,8 @@ async def add_posts(username: str, title: str, content: str, category: str, tags
             await db.commit()
 
             return {"ok": True}
+    except sqlite3.IntegrityError:
+        return {"ok": False, "message": "Ошибка нарушения уникального ограничения"}
     except Exception as e:
         return {"ok": False, "message": e}
 

@@ -29,7 +29,7 @@
       <span id="closeModal" class="close">&times;</span>
       <h2>Новый пост</h2>
       <form id="postForm">
-        <input type="text" id="postUser" placeholder="Пользователь" required>
+        <input type="text" id="postUser" placeholder="Пользователь" readonly>
         <input type="text" id="postTitle" placeholder="Заголовок" required>
         <textarea id="postContent" placeholder="Содержание" required></textarea>
         <input type="text" id="postCategory" placeholder="Категория" required>
@@ -74,9 +74,26 @@
     document.addEventListener("DOMContentLoaded", () => {
       getAllPosts();
 
+      const storedUser = localStorage.getItem("userId");
+  
+      // Проверяем, если пользователь не найден, перенаправляем на страницу входа
+      if (!storedUser) {
+        window.location.href = "login.html";
+        return;
+      }
+
+      // Устанавливаем значение поля формы для создания поста
+      const postUserInput = document.getElementById("postUser");
+      if (postUserInput) {
+        postUserInput.value = storedUser;
+      }
+
+
+
       const postForm = document.getElementById("postForm");
       postForm.addEventListener("submit", async (e) => {
         e.preventDefault();
+
         const username = document.getElementById("postUser").value.trim()
         const title = document.getElementById("postTitle").value.trim();
         const content = document.getElementById("postContent").value.trim();
@@ -85,6 +102,9 @@
         // const imageUrl = document.getElementById("postImageUrl").value.trim();
         const imageUrl = null;
         const tags = tagsInput ? tagsInput.split(",").map(tag => tag.trim()).filter(tag => tag) : [];
+
+        const storedUser = localStorage.getItem("userId");
+
 
         if (title && content && category) {
           await createPost({ title, username, content, category, tags, image_url: imageUrl || null });
@@ -96,7 +116,7 @@
         }
       });
 
-      const token = localStorage.getItem("access_token");
+      const token = localStorage.getItem("my_access_token");
       const navLinks = document.getElementById("navLinks");
 
       if (token) {

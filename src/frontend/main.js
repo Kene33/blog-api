@@ -118,7 +118,7 @@ async function loginUser(userData) {
     });
     const result = await response.json();
     if (result.ok && result.access_token) {
-      localStorage.setItem("access_token", result.access_token);
+      localStorage.setItem("my_access_token", result.access_token);
       // Перенаправляем пользователя, например, на профиль
       window.location.href = "profile.html";
     }

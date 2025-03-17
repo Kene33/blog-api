@@ -36,7 +36,7 @@ async def login(creds: UserLoginSchema, response: Response):
     if user_exist["ok"]:
         token = security.create_access_token(uid=creds.username, expiry=timedelta(hours=12))
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token, samesite="lax", httponly=True)
-        return {"ok": True, "access_token": token}
+        return {"ok": True, "access_token": token, "username": creds.username}
     
     return {"ok": False, "message": "Wrong password or username"}
 

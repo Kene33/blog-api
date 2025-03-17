@@ -23,22 +23,30 @@
       <div id="loginMessage"></div>
     </section>
   </main>
+  <!-- Подключаем основной JS-файл, где определена функция loginUser -->
   <script src="main.js"></script>
   <script>
+    // Обработчик отправки формы входа
     document.getElementById("loginForm").addEventListener("submit", async (e) => {
       e.preventDefault();
       const username = document.getElementById("loginUsername").value.trim();
       const password = document.getElementById("loginPassword").value;
-      const result = await loginUser({ username, password });
       const loginMessage = document.getElementById("loginMessage");
-      console.log(result.ok)
-      if(result.status === "ok") {
-        // Например, сохраняем userId и переходим на главную или профиль
-        localStorage.setItem("userId", result.user.id);
+      
+      // Вызов функции авторизации
+      const result = await loginUser({ username, password });
+      
+      console.log(result);
+      
+      if(result.ok === true) {
+        // Сохраняем идентификатор пользователя (например, username) в localStorage
+        localStorage.setItem("userId", username);
+        loginMessage.style.color = "green";
         loginMessage.textContent = "Вход выполнен успешно!";
-        // Редирект, например:
+        // Перенаправляем на главную страницу
         window.location.href = "index.html";
       } else {
+        loginMessage.style.color = "red";
         loginMessage.textContent = result.detail || "Ошибка входа";
       }
     });

@@ -1,3 +1,4 @@
+from fastapi.staticfiles import StaticFiles
 import uvicorn
 import asyncio
 import authx.exceptions
