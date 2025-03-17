@@ -15,10 +15,11 @@ config.JWT_CSRF_METHODS = []
 
 security = AuthX(config=config)
 
-
-@router.post("/api/user/{user_id}", dependencies=[Depends(security.access_token_required)])
+# dependencies=[Depends(security.access_token_required)]
+@router.get("/api/user/{username}")
 async def user_page(username: str):
     user_exist = await users_db.get_user(username)
+    print(user_exist)
     if user_exist:
         return user_exist
     
@@ -51,5 +52,5 @@ async def register(creds: UserLoginSchema): # file: UploadFile
     user_exists = await users_db.get_user(creds.username)
     if user_exists["ok"]: return {"ok": False, "message": "Username already exists"}
 
-    user = await users_db.add_user(creds.username, creds.password, current_time, None)
+    user = await users_db.add_user(creds.username, creds.password, current_time)
     return user

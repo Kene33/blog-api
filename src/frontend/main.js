@@ -147,7 +147,7 @@ async function registerUser(userData) {
 // Функция для получения данных пользователя по id
 async function getUser(userId) {
   try {
-    const response = await fetch(`${API_BASE}/user/${userId}`);
+    const response = await fetch(`${API_BASE}/api/user/${userId}`);
     if (!response.ok) throw new Error("Ошибка при загрузке пользователя");
     return await response.json();
   } catch (error) {
