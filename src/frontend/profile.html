@@ -41,10 +41,11 @@
       if (user) {
         const profileContainer = document.getElementById("profileContainer");
         profileContainer.innerHTML = `
-          <h2>${user.username}</h2>
-          <p>ID: ${user.id}</p>
-          <p>Email: ${user.email ? user.email : "не указан"}</p>
-          ${user.avatar_url ? `<img src="${user.avatar_url}" alt="Avatar" class="avatar">` : ""}
+          <h2>${user[0]}</h2>
+          <p>Posts quantity: ${user.user_info[3]}</p>
+          <p>Email: ${user.user_info.email ? user.user_info.email : "не указан"}</p>
+          <p>Created: ${user.user_info[2]}
+          ${user.user_info.avatar_url ? `<img src="${user.user_info.avatar_url}" alt="Avatar" class="avatar">` : ""}
         `;
       } else {
         document.getElementById("profileContainer").innerHTML = "<p>Профиль не найден</p>";
