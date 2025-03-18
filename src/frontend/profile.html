@@ -44,9 +44,9 @@
         const profileContainer = document.getElementById("profileContainer");
         profileContainer.innerHTML = `
           <h2><b>${user.user_info[0]}</b></h2> ${user.user_info.avatar_url ? `<img src="${user.user_info.avatar_url}" alt="Avatar" class="avatar">` : ""}
-          <p><b>Posts quantity: ${user.user_info[3]}</b></p>
-          <p><b>Email: ${user.user_info.email ? user.user_info.email : "не указан"}</b></p>
-          <p><b>Created: ${user.user_info[2]}</b></p>
+          <p><b>Кол-во постов: ${user.user_info[3]}</b></p>
+          <p><b>Почта: ${user.user_info.email ? user.user_info.email : "не указан"}</b></p>
+          <p><b>Зарегистрирован: ${user.user_info[2]}</b></p>
         `;
       } else {
         document.getElementById("profileContainer").innerHTML = "<p>Профиль не найден</p>";
