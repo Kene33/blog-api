@@ -37,7 +37,7 @@ function timeAgo(dateString) {
   }
   // Если пост был создан меньше месяца назад, выводим количество дней
   else if (days > 0) {
-      return `${days} день${days === 1 ? '' : 'я'} назад`;
+      return `${days} день${days === 1 ? '' : ''} назад`;
   }
   // Для секунд и минут
   else if (hours > 0) {

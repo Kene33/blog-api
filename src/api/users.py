@@ -19,7 +19,6 @@ security = AuthX(config=config)
 @router.get("/api/user/{username}")
 async def user_page(username: str):
     user_exist = await users_db.get_user(username)
-    print(user_exist)
     if user_exist:
         return user_exist
     

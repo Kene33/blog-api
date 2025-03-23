@@ -48,7 +48,6 @@ async def add_post(data: Posts): # file: UploadFile = File(None)
     await db_posts.create_database()
     await db_users.posts_counter(username)
     added_post = await db_posts.add_posts(username, title, content, category, tags, createdAt, image_url)
-    print(added_post)
     if added_post["ok"]:
         return {"ok": True, "message": "Post added successfully"}
     raise HTTPException(status_code=400, detail="Error adding post")

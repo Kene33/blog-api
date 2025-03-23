@@ -24,7 +24,6 @@ async def upload_media(file: UploadFile = File(...)):
         new_filename = f"{uuid.uuid4()}{ext}"
         file_path = os.path.join(UPLOAD_DIR, new_filename)
 
-        # Сохраняем файл
         with open(file_path, "wb") as buffer:
             buffer.write(await file.read())
 
