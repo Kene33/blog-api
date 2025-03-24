@@ -31,6 +31,7 @@ function timeAgo(dateString) {
   if (years > 0) {
       return date.toLocaleString(); // Отобразится как "14.03.2025, 19:18:27" или в зависимости от локали
   }
+
   // Если пост был создан несколько месяцев назад, выводим сколько месяцев назад
   else if (months > 0) {
       return `${months} месяц${months === 1 ? '' : 'a'} назад`;
