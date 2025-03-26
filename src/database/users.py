@@ -40,4 +40,3 @@ async def posts_counter(username: str):
     async with aiosqlite.connect(DATABASE) as db:
         await db.execute("UPDATE users SET posts_count = posts_count + 1 WHERE username = ?", (username,))
         await db.commit()
-        print(f"{username} | posts_count + 1")

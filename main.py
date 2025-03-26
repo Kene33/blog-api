@@ -2,7 +2,7 @@ import uvicorn
 import asyncio
 import authx.exceptions
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, Request, status
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -14,7 +14,7 @@ app = FastAPI(title="BLOG AP123I", description="CRUD API for blog.")
 app.include_router(api_router)
 
 @app.exception_handler(authx.exceptions.MissingTokenError)
-async def missing_token_exception_handler():
+async def missing_token_exception_handler(request: Request, exc: authx.exceptions.MissingTokenError):
     return JSONResponse(
         status_code=status.HTTP_401_UNAUTHORIZED,
         content={"detail": "Вы не вошли в аккаунт"}
