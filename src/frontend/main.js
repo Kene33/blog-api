@@ -111,7 +111,7 @@ async function createPost(postData) {
 
 async function loginUser(userData) {
   try {
-    const response = await fetch(`${API_BASE}/login`, {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
@@ -133,7 +133,7 @@ async function loginUser(userData) {
 // Функция для регистрации пользователя
 async function registerUser(userData) {
   try {
-    const response = await fetch(`${API_BASE}/register`, {
+    const response = await fetch(`${API_BASE}/api/auth/register`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData)

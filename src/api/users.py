@@ -25,7 +25,7 @@ async def user_page(username: str):
     return {"ok": False, "message": "Cant find user"}
 
 
-@router.post("/login")
+@router.post("/api/auth/login")
 async def login(creds: UserLoginSchema, response: Response):
     user_exist = await users_db.get_user(creds.username)
     if creds.username == "test" and creds.password == "test":
@@ -42,7 +42,7 @@ async def login(creds: UserLoginSchema, response: Response):
 
 ### dependencies=[Depends(security.access_token_required)]
 
-@router.post("/register")
+@router.post("/api/auth/register")
 async def register(creds: UserLoginSchema): # file: UploadFile
     #avatar_url = f"{creds.username}:{file.filename}"
 

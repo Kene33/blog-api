@@ -3,9 +3,7 @@ from typing import Optional
 import aiosqlite
 import json
 
-from fastapi import HTTPException
-
-DATABASE = "src/database/database.db"
+DATABASE = "src/database/posts.db"
 
 
 async def create_database() -> None:
