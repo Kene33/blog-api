@@ -1,87 +1,172 @@
 # BLOG API
 
+<div align="center">
+
+![FastAPI](https://img.shields.io/badge/FastAPI-0.68.0-009688?style=flat-square&logo=fastapi)
+![Python](https://img.shields.io/badge/Python-3.10+-blue?style=flat-square&logo=python)
+![SQLite](https://img.shields.io/badge/SQLite-3.0.0-003B57?style=flat-square&logo=sqlite)
+
+</div>
+
+<div align="center">
+  <img src="https://media1.tenor.com/m/gMU9WdWa4YIAAAAd/d4dj-d4dj-meme.gif" alt="anime gifka" width="350">
+</div>
+
 ## Описание
 
-BLOG API — это API для управления публикациями блога. Этот API позволяет пользователям создавать, получать, и удалять публикации, а также искать публикации по тегам. API построен с использованием FastAPI, поддерживает асинхронные операции с aiosqlite и использует Pydantic для валидации данных.
+BLOG API — это современное веб-приложение для управления публикациями блога. Проект построен на FastAPI и использует HTML/CSS/JavaScript для фронтенда. 
+
+### Основные возможности
+
+- JWT аутентификация
+- Создание и управление постами
+- Профили пользователей
+- Категории и теги
+- Темная тема
+- Адаптивный дизайн
 
 ## Установка
 
 ### Необходимые зависимости
 
-- Python 3.10 или выше
+- Python 3.10+
 - FastAPI
 - Uvicorn
 - Pydantic
-- Aiosqlite
+- SQLite3
 
 ### Шаги по установке
 
 1. **Клонируйте репозиторий:**
-
    ```bash
    git clone https://github.com/Kene33/blog-api.git
    cd blog-api
    ```
 
 2. **Установите зависимости:**
-
    ```bash
    pip install -r requirements.txt
    ```
 
-3. **Запустите приложение:**
-
+3. **Запустите сервер:**
    ```bash
-   python main.py
+   uvicorn src.main:app --reload --port 4000
    ```
 
-## Эндпоинты API
+4. **Откройте frontend/index.html в браузере**
 
-### **1. Получение всех постов**
+## API Endpoints
 
-- **GET** `/api/posts`
+### Аутентификация
 
-  Возвращает список всех постов.
+#### Регистрация
+```http
+POST /api/auth/register
+Content-Type: application/json
 
-### **2. Получение публикаций пользователя**
+{
+    "username": "username",
+    "password": "password"
+}
+```
 
-- **GET** `/api/posts/user/{user_id}`
+#### Вход
+```http
+POST /api/auth/login
+Content-Type: application/json
 
-  Возвращает все посты пользователя.
+{
+    "username": "username",
+    "password": "password"
+}
+```
 
-### **3. Создание публикации**
+### Посты
 
-- **POST** `/api/posts`
+#### Получение всех постов
+```http
+GET /api/posts
+```
 
-  Тело запроса:
+#### Создание поста
+```http
+POST /api/posts
+Authorization: Bearer <token>
+Content-Type: application/json
 
-  ```json
-  {
-      "user_id": 2311,
-      "username": "kenee33",
-      "title": "Название",
-      "content": "Содержимое",
-      "category": "Категория",
-      "tags": ["tag1", "tag2"]
-  }
-  ```
+{
+    "title": "Заголовок",
+    "content": "Содержимое",
+    "category": "Категория",
+    "tags": ["tag1", "tag2"]
+}
+```
 
-### **4. Удаление поста**
+#### Удаление поста
+```http
+DELETE /api/posts/{post_id}
+Authorization: Bearer <token>
+```
 
-- **DELETE** `/api/posts`
+### Пользователи
 
-  Удаляет публикацию по ID.
+#### Информация о пользователе
+```http
+GET /api/user/{username}
+```
 
-## TODO
-- Добавить JWT-аутентификацию. [DONE]
-- Создать небольшой сайт с использованием этого API. [DONE]
-- Добавить возможность добавлять изображения к постам. [IN PROGRESS]
-- Добавить возможность комментировать посты. [IN PROGRESS]
-- Добавить возможность оценивать посты. [IN PROGRESS]
-- Добавить возможность делиться постами. [IN PROGRESS]
-- Добавить возможность искать посты по тегам. [IN PROGRESS]
-- Добавить возможность искать посты по названию. [IN PROGRESS]
-- Добавить возможность искать посты по содержимому. [IN PROGRESS]
-- Добавить возможность сортировать посты по дате. [IN PROGRESS]
+## Фронтенд
 
-но это все очень очень вряд ли
+Фронтенд часть приложения включает:
+
+- Адаптивный дизайн
+- Темная тема
+- Модальные окна
+- Система аутентификации
+- Профиль пользователя
+- Теги и категории
+
+## TODO (только api)
+
+- [x] JWT аутентификация
+- [x] Базовый фронтенд
+- [x] Создание постов
+- [x] Удаление постов
+- [x] Профиль пользователя
+- [ ] Загрузка изображений
+- [ ] Комментарии к постам
+- [ ] Оценка постов
+- [ ] Шаринг постов
+- [ ] Поиск по тегам
+- [ ] Поиск по названию
+- [ ] Поиск по содержимому
+- [ ] Сортировка по дате
+
+## Структура проекта
+
+```
+blog-api/
+├── src/
+│   ├── api/           # FastAPI эндпоинты
+│   │   ├── posts.py   # Эндпоинты для постов
+│   │   ├── users.py   # Эндпоинты для пользователей
+│   │   └── images.py  # Эндпоинты для изображений
+│   ├── database/      # Работа с базой данных
+│   │   ├── posts.py   # Модели и операции с постами
+│   │   └── users.py   # Модели и операции с пользователями
+│   ├── schemas/       # Pydantic модели
+│   │   ├── posts.py   # Схемы для постов
+│   │   └── users.py   # Схемы для пользователей
+│   └── frontend/      # Фронтенд часть
+│       ├── index.html    # Главная страница
+│       ├── login.html    # Страница входа
+│       ├── register.html # Страница регистрации
+│       ├── profile.html  # Страница профиля
+│       ├── main.js       # Основной JavaScript
+│       └── style.css     # Стили
+└── requirements.txt   # Зависимости Python
+```
+
+## Лицензия
+
+MIT License
