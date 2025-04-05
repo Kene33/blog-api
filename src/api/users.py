@@ -29,7 +29,7 @@ async def user_page(username: str):
 async def login(creds: UserLoginSchema, response: Response):
     user_exist = await users_db.get_user(creds.username)
     if creds.username == "test" and creds.password == "test":
-        token = security.create_access_token(uid=creds.username, expiry=timedelta(hours=12))
+        token = security.create_access_token(uid="123456499", expiry=timedelta(hours=12))
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token, samesite="lax", httponly=True)
         return {"ok": True, "access_token": token}
 
