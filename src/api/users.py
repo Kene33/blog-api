@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Response
 from authx import AuthX, AuthXConfig
 
 from src.database import users as users_db
