@@ -50,7 +50,7 @@ BLOG API — это современное веб-приложение для у
 
 3. **Запустите сервер:**
    ```bash
-   uvicorn src.main:app --reload --port 4000
+   python main.py
    ```
 
 4. **Откройте frontend/index.html в браузере**
