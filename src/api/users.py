@@ -33,19 +33,15 @@ async def login(creds: UserLoginSchema, response: Response):
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token, samesite="lax", httponly=True)
         return {"ok": True, "access_token": token}
 
-    if user_exist["ok"]:
+    if user_exist:
         token = security.create_access_token(uid=creds.username, expiry=timedelta(hours=12))
         response.set_cookie(config.JWT_ACCESS_COOKIE_NAME, token, samesite="lax", httponly=True)
         return {"ok": True, "access_token": token, "username": creds.username}
     
     return {"ok": False, "message": "Wrong password or username"}
 
-### dependencies=[Depends(security.access_token_required)]
-
 @router.post("/api/auth/register")
 async def register(creds: UserLoginSchema): # file: UploadFile
-    #avatar_url = f"{creds.username}:{file.filename}"
-
     current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     user_exists = await users_db.get_user(creds.username)
