@@ -21,9 +21,9 @@ async def get_user(username: str) -> bool:
         async with aiosqlite.connect(DATABASE) as db:
             async with db.execute("SELECT * FROM users WHERE username = ?", (username,)) as cursor:
                 result = await cursor.fetchone()
-                if result: return {"ok": True, "user_info": result}
+                if result: return result
 
-                return {"ok": False, "message": "Cant find user"}
+                return False
 
 async def add_user(username: str, password: str, createdAt: str = None, posts_count: int = 0, avatar_url: str = None):
     async with aiosqlite.connect(DATABASE) as db:

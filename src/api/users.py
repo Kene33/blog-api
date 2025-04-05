@@ -20,8 +20,8 @@ security = AuthX(config=config)
 async def user_page(username: str):
     user_exist = await users_db.get_user(username)
     if user_exist:
-        return user_exist
-    
+        return {"ok": True, "user": user_exist}
+
     return {"ok": False, "message": "Cant find user"}
 
 
